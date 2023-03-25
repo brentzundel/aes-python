@@ -1,4 +1,4 @@
-from AES import key_expansion, Cipher
+from AES import KeyExpansion, Cipher
 from AESHelp import xor, pad_strip, msb, lsb, aes_file_helper
 
 
@@ -32,7 +32,7 @@ def aes_cfb_helper(bits, in_name, key, out_name, s):
     if s % 8 != 0 or s < 8 or s > 128:
         raise Exception("s must be a multiple of 8, between 8 and 128")
     b = s // 8
-    keys = key_expansion(key, n_k)
+    keys = KeyExpansion(key, n_k)
     return b, f_in, f_out, keys, n_k
 
 

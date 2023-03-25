@@ -1,4 +1,4 @@
-from AES import key_expansion, Cipher, InvCipher
+from AES import KeyExpansion, Cipher, InvCipher
 from AESHelp import pad_strip, xor, aes_file_helper
 
 
@@ -30,7 +30,7 @@ described in NIST Special Publication 800-38A."""
 
 def aes_cbc_helper(bits, in_name, key, out_name):
     f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
-    keys = key_expansion(key, n_k)
+    keys = KeyExpansion(key, n_k)
     return f_in, f_out, keys, n_k
 
 

@@ -1,4 +1,5 @@
-from AES import key_expansion
+from AES import KeyExpansion
+from AESTables import ltable, a_table
 
 
 def in_to_state(bytestring, n_b=4):
@@ -140,7 +141,7 @@ def aes_file_helper(bits, in_name, out_name):
 def aes_ctr_ofb_helper(bits, in_name, key, mode, out_name):
     from os import urandom
     f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
-    keys = key_expansion(key, n_k)
+    keys = KeyExpansion(key, n_k)
     if mode == 'e':
         ctr = urandom(16)
         f_out.write(ctr)
@@ -150,3 +151,70 @@ def aes_ctr_ofb_helper(bits, in_name, key, mode, out_name):
         raise Exception('Unsupported Mode')
     m = f_in.read(16)
     return ctr, f_in, f_out, keys, m, n_k
+
+
+#
+# Subordinate Functions for those
+# Functions used by AES Cipher
+# and AES Inverse Cipher
+#
+def gf_mult(a, b, n=8, ip=0x11b):
+    """
+gf_mult(a, b, n=8, ip=0x11b) -> number
+
+gf_mult performs finite field multiplication for Galois
+Field 2^n using irreducible polynomial ip. Based on algorithm
+found at https://en.wikipedia.org/wiki/Finite_field_arithmetic."""
+    p = 0
+    test = 2 ** n
+    while n > 0:
+        if b & 1 == 1:
+            p = p ^ a
+        else:
+            p = p ^ 0
+        a = a << 1
+        if a & test == test:
+            a = a ^ ip
+        else:
+            a = a ^ 0
+        b = b >> 1
+        n = n - 1
+    return p
+
+
+def gf_mul(a, b):
+    """
+gf_mul(a, b) -> number
+
+gf_mul is a Galois Field Multiplication function that is
+equivalent to gf_mult, but is based on log and exponent
+table lookup to increase security against side channel
+attacks.  Based on algorithm found at
+https://www.samiam.org/galois.html."""
+    z = 0
+    s = ltable[a] + ltable[b]
+    s %= 255
+    s = a_table[s]
+    q = s
+    if a == 0:
+        s = z
+    else:
+        s = q
+    if b == 0:
+        s = z
+    return s
+
+
+def get_columns(state, n_b=4):
+    """
+get_columns(state, n_b=4) -> column list
+
+get_columns converts a state (2D array of longs) into
+a column list (2D array of longs).
+get_columns is its own inverse, i.e.
+  state = get_columns(get_columns(state))."""
+    out = [[0 for _ in range(n_b)] for _ in range(4)]
+    for col in range(n_b):
+        for row in range(4):
+            out[col][row] = state[row][col]
+    return out

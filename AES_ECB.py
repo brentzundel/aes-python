@@ -1,4 +1,4 @@
-from AES import Cipher, InvCipher, key_expansion
+from AES import Cipher, InvCipher, KeyExpansion
 from AESHelp import pad_strip, aes_file_helper
 
 
@@ -10,7 +10,7 @@ aes_encrypt_ecb performs 128, 192, or 256-bit AES encryption
 using the Electronic Code Book block cipher mode of operation
 described in NIST Special Publication 800-38A."""
     f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
-    keys = key_expansion(key, n_k)
+    keys = KeyExpansion(key, n_k)
     os = f_in.read(16)
     while os != b'':
         m_len = len(os)
@@ -33,7 +33,7 @@ aes_decrypt_ecb performs 128, 192, or 256-bit AES decryption
 using the Electronic Code Book block cipher mode of operation
 described in NIST Special Publication 800-38A.  """
     f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
-    keys = key_expansion(key, n_k)
+    keys = KeyExpansion(key, n_k)
     os = f_in.read(16)
     while os != b'':
         c = os
