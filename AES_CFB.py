@@ -1,5 +1,5 @@
-from AES import KeyExpansion, Cipher
-from AESHelp import xor, padStrip, MSB, LSB
+from AES import key_expansion, Cipher
+from AESHelp import xor, pad_strip, msb, lsb
 
 def AES_Encrypt_CFB(key, bits, s, inName, outName='myfile'):
   '''
@@ -28,7 +28,7 @@ described in NIST Special Publication 800-38A.'''
   if s % 8 != 0 or s < 8 or s > 128:
     raise Exception("s must be a multiple of 8, between 8 and 128")
   B = s//8
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   IV = urandom(16)
   fout.write(IV)
   I = IV
@@ -38,10 +38,10 @@ described in NIST Special Publication 800-38A.'''
     if pLen < B:
       P = P + b'\x80' + bytes(B - pLen - 1)
     O = Cipher(I, keys, Nk)
-    C = xor(P, MSB(s, O))
+    C = xor(P, msb(s, O))
     fout.write(C)
     P = fin.read(B)
-    I = LSB(128-s, I) + C
+    I = lsb(128 - s, I) + C
   fin.close()
   fout.close()
 
@@ -72,16 +72,16 @@ described in NIST Special Publication 800-38A.  '''
   if s % 8 != 0 or s < 8 or s > 128:
     raise Exception("s must be a multiple of 8, between 8 and 128")
   B = s//8
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   I = fin.read(16)
   C = fin.read(B)
   while C != b'':
     O = Cipher(I, keys, Nk)
-    P = xor(C, MSB(s, O))
-    I = LSB(128-s, I) + C
+    P = xor(C, msb(s, O))
+    I = lsb(128 - s, I) + C
     C = fin.read(B)
     if C == b'' and B > 1:
-      P = padStrip(P)
+      P = pad_strip(P)
     fout.write(P)
   fin.close()
   fout.close()

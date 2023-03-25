@@ -1,5 +1,5 @@
-from AES import KeyExpansion, Cipher
-from AESHelp import xor, padStrip, MSB, LSB
+from AES import key_expansion, Cipher
+from AESHelp import xor, pad_strip, msb, lsb
 
 def AES_Cipher_OFB(key, bits, mode, inName, outName='myfile'):
   '''
@@ -25,7 +25,7 @@ of operation described in NIST Special Publication 800-38A.'''
     Nk = 8
   else:
     raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   if mode == 'e':
     I = urandom(16)
     fout.write(I)
@@ -40,7 +40,7 @@ of operation described in NIST Special Publication 800-38A.'''
     M = fin.read(16)
   if M != b'':
     I = Cipher(I, keys, Nk)
-    fout.write(xor(M, MSB(len(M)*8, I)))
+    fout.write(xor(M, msb(len(M) * 8, I)))
   fin.close()
   fout.close()
 

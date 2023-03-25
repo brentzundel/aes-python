@@ -1,5 +1,5 @@
-from AES import KeyExpansion, Cipher, InvCipher
-from AESHelp import padStrip, xor
+from AES import key_expansion, Cipher, InvCipher
+from AESHelp import pad_strip, xor
 
 
 def aes_encrypt_cbc(key, bits, in_name, out_name='file'):
@@ -45,7 +45,7 @@ def aes_cbc_helper(bits, in_name, key, out_name):
         n_k = 8
     else:
         raise Exception("%d-bit Encryption is not supported" % bits)
-    keys = KeyExpansion(key, n_k)
+    keys = key_expansion(key, n_k)
     return fin, fout, keys, n_k
 
 
@@ -64,7 +64,7 @@ described in NIST Special Publication 800-38A.  """
         iv = os
         os = fin.read(16)
         if os == b'':
-            m = padStrip(m)
+            m = pad_strip(m)
         fout.write(m)
     fin.close()
     fout.close()

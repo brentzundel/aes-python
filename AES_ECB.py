@@ -1,5 +1,5 @@
-from AES import Cipher, InvCipher, KeyExpansion
-from AESHelp import padStrip, xor
+from AES import Cipher, InvCipher, key_expansion
+from AESHelp import pad_strip, xor
 
 
 def AES_Encrypt_ECB(key, bits, inName, outName='myfile'):
@@ -25,7 +25,7 @@ described in NIST Special Publication 800-38A.'''
     Nk = 8
   else:
     raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   OS = fin.read(16)
   while OS != b'':
     mLen = len(OS)
@@ -64,14 +64,14 @@ described in NIST Special Publication 800-38A.  '''
     Nk = 8
   else:
     raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   OS = fin.read(16)
   while OS != b'':
     C = OS
     OS = fin.read(16)
     M = InvCipher(C, keys, Nk)
     if OS == b'':
-      M = padStrip(M)
+      M = pad_strip(M)
     fout.write(M)
   fin.close()
   fout.close()

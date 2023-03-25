@@ -1,5 +1,5 @@
-from AES import KeyExpansion, Cipher
-from AESHelp import xor, padStrip, MSB, LSB
+from AES import key_expansion, Cipher
+from AESHelp import xor, pad_strip, msb, lsb
 
 def AES_Cipher_CTR(key, bits, mode, inName, outName='myfile'):
   '''
@@ -25,7 +25,7 @@ of operation described in NIST Special Publication 800-38A.'''
     Nk = 8
   else:
     raise Exception("%d-bit Encryption is  not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
+  keys = key_expansion(key, Nk)
   if mode == 'e':
     ctr = urandom(16)
     fout.write(ctr)
@@ -41,7 +41,7 @@ of operation described in NIST Special Publication 800-38A.'''
     ctr = increment(ctr)
   if M != b'':
     I = Cipher(ctr, keys, Nk)
-    fout.write(xor(M, MSB(len(M)*8, I)))
+    fout.write(xor(M, msb(len(M) * 8, I)))
   fin.close()
   fout.close()
 
@@ -49,7 +49,7 @@ of operation described in NIST Special Publication 800-38A.'''
  
 def increment(OS, i=1):
   '''
-increment(OS, i=1) -> bytes
+increment(os, i=1) -> bytes
 
 increment takes a bytes object and returns a 
 bytes object that has been incremented by i.'''
