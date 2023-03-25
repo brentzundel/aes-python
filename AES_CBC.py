@@ -2,154 +2,141 @@ from AES import KeyExpansion, Cipher, InvCipher
 from AESHelp import padStrip, xor
 
 
-def AES_Encrypt_CBC(key, bits, inName, outName='myfile'):
-  '''
-AES_Encrypt_CBC(key, bits, inName, outName='myfile') -> file
-  
-AES_Encrypt_CBC performs 128, 192, or 256-bit AES encryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.'''
-  from os import urandom
-  try:
-    fin = open(inName, 'rb')
-  except:
-    raise Exception("Error opening file: %s" %(inName))
-  try:
-    fout = open(outName, 'wb')
-  except:
-    raise Exception("Error opening output file")
-  if bits == 128:
-    Nk = 4
-  elif bits == 192:
-    Nk = 6
-  elif bits == 256:
-    Nk = 8
-  else:
-    raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
-  IV = urandom(16)
-  fout.write(IV)
-  C = IV
-  OS = fin.read(16)
-  while OS != b'':
-    mLen = len(OS)
-    if mLen < 16:
-      PT = OS + b'\x80' + bytes(16 - mLen - 1)
+def aes_encrypt_cbc(key, bits, in_name, out_name='file'):
+    """
+aes_encrypt_cbc(key, bits, in_name, out_name='file') -> file
+
+aes_encrypt_cbc performs 128, 192, or 256-bit AES encryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A."""
+    from os import urandom
+    fin, fout, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
+    iv = urandom(16)
+    fout.write(iv)
+    c = iv
+    os = fin.read(16)
+    while os != b'':
+        m_len = len(os)
+        if m_len < 16:
+            pt = os + b'\x80' + bytes(16 - m_len - 1)
+        else:
+            pt = os
+        c = Cipher(xor(pt, c), keys, n_k)
+        fout.write(c)
+        os = fin.read(16)
+    fin.close()
+    fout.close()
+
+
+def aes_cbc_helper(bits, in_name, key, out_name):
+    try:
+        fin = open(in_name, 'rb')
+    except OSError:
+        raise
+    try:
+        fout = open(out_name, 'wb')
+    except OSError:
+        raise
+    if bits == 128:
+        n_k = 4
+    elif bits == 192:
+        n_k = 6
+    elif bits == 256:
+        n_k = 8
     else:
-      PT = OS
-    C = Cipher(xor(PT, C), keys, Nk)
-    fout.write(C)
-    OS = fin.read(16)
-  fin.close()
-  fout.close()
+        raise Exception("%d-bit Encryption is not supported" % bits)
+    keys = KeyExpansion(key, n_k)
+    return fin, fout, keys, n_k
 
- 
-def AES_Decrypt_CBC(key, bits, inName, outName):
-  '''
-AES_Decrypt_CBC(key, bits, inName, outName) -> file
+
+def aes_decrypt_cbc(key, bits, in_name, out_name):
+    """
+aes_decrypt_cbc(key, bits, in_name, out_name) -> file
+
+aes_decrypt_cbc performs 128, 192, or 256-bit AES decryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A.  """
+    fin, fout, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
+    iv = fin.read(16)
+    os = fin.read(16)
+    while os != b'':
+        m = xor(InvCipher(os, keys, n_k), iv)
+        iv = os
+        os = fin.read(16)
+        if os == b'':
+            m = padStrip(m)
+        fout.write(m)
+    fin.close()
+    fout.close()
+
+
+def aes_encrypt_128_cbc(key, in_name, out_name='file'):
+    """
+aes_encrypt_128_cbc(key, in_name, out_name='file') -> file
   
-AES_Decrypt_CBC performs 128, 192, or 256-bit AES decryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.  '''
-  try:
-    fin = open(inName, 'rb')
-  except:
-    raise Exception("Error opening file: %s" %(inName))
-  try:
-    fout = open(outName, 'wb')
-  except:
-    raise Exception("Error opening output file")
-  if bits == 128:
-    Nk = 4
-  elif bits == 192:
-    Nk = 6
-  elif bits == 256:
-    Nk = 8
-  else:
-    raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = KeyExpansion(key, Nk)
-  IV = fin.read(16)
-  OS = fin.read(16)
-  while OS != b'':
-    M = xor(InvCipher(OS, keys, Nk), IV)
-    IV = OS
-    OS = fin.read(16)
-    if OS == b'':
-      M = padStrip(M)
-    fout.write(M)
-  fin.close()
-  fout.close()
+aes_encrypt_128_cbc performs 128-bit AES encryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_encrypt_cbc(key, 128, in_name, out_name)
 
 
- 
-def AES_Encrypt_128_CBC(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_128_CBC(key, inName, outName='myfile') -> file
+def aes_encrypt_192_cbc(key, in_name, out_name='file'):
+    """
+aes_encrypt_192_cbc(key, in_name, out_name='file') -> file
   
-AES_Encrypt_128_CBC performs 128-bit AES encryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Encrypt_CBC(key, 128, inName, outName)
+aes_encrypt_192_cbc performs 192-bit AES encryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_encrypt_cbc(key, 192, in_name, out_name)
 
 
-def AES_Encrypt_192_CBC(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_192_CBC(key, inName, outName='myfile') -> file
+def aes_encrypt_256_cbc(key, in_name, out_name='file'):
+    """
+aes_encrypt_256_cbc(key, in_name, out_name='file') -> file
   
-AES_Encrypt_192_CBC performs 192-bit AES encryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Encrypt_CBC(key, 192, inName, outName)
+aes_encrypt_256_cbc performs 256-bit AES encryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_encrypt_cbc(key, 256, in_name, out_name)
 
 
-def AES_Encrypt_256_CBC(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_256_CBC(key, inName, outName='myfile') -> file
+def aes_decrypt_128_cbc(key, in_name, out_name):
+    """
+aes_decrypt_128_cbc(key, in_name, out_name) -> file
   
-AES_Encrypt_256_CBC performs 256-bit AES encryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Encrypt_CBC(key, 256, inName, outName)
+aes_decrypt_128_cbc performs 128-bit AES decryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_decrypt_cbc(key, 128, in_name, out_name)
 
+
+def aes_decrypt_192_cbc(key, in_name, out_name):
+    """
+aes_decrypt_192_cbc(key, in_name, out_name) -> file
   
- 
-def AES_Decrypt_128_CBC(key, inName, outName):
-  '''
-AES_Decrypt_128_CBC(key, inName, outName) -> file
+aes_decrypt_192_cbc performs 192-bit AES decryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_decrypt_cbc(key, 192, in_name, out_name)
+
+
+def aes_decrypt_256_cbc(key, in_name, out_name):
+    """
+aes_decrypt_256_cbc(key, in_name, out_name) -> file
   
-AES_Decrypt_128_CBC performs 128-bit AES decryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Decrypt_CBC(key, 128, inName, outName)
-
-
-def AES_Decrypt_192_CBC(key, inName, outName):
-  '''
-AES_Decrypt_192_CBC(key, inName, outName) -> file
-  
-AES_Decrypt_192_CBC performs 192-bit AES decryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Decrypt_CBC(key, 192, inName, outName)
-
-
-def AES_Decrypt_256_CBC(key, inName, outName):
-  '''
-AES_Decrypt_256_CBC(key, inName, outName) -> file
-  
-AES_Decrypt_256_CBC performs 256-bit AES decryption
-using the Cipher Block Chaining mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Decrypt_CBC(key, 256, inName, outName)
+aes_decrypt_256_cbc performs 256-bit AES decryption
+using the cipher Block chaining mode of operation
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_decrypt_cbc(key, 256, in_name, out_name)
