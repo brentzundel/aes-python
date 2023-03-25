@@ -112,3 +112,23 @@ lsb returns the s least significant bits from os."""
         return b''
     else:
         return os[-b:]
+
+
+def aes_file_helper(bits, in_name, out_name):
+    try:
+        fin = open(in_name, 'rb')
+    except OSError:
+        raise
+    try:
+        fout = open(out_name, 'wb')
+    except OSError:
+        raise
+    if bits == 128:
+        n_k = 4
+    elif bits == 192:
+        n_k = 6
+    elif bits == 256:
+        n_k = 8
+    else:
+        raise Exception("%d-bit Encryption is not supported" % bits)
+    return fin, fout, n_k

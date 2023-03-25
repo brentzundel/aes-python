@@ -4,7 +4,7 @@ from AESHelp import pad_strip, xor
 
 def AES_Encrypt_ECB(key, bits, inName, outName='myfile'):
   '''
-AES_Encrypt_ECB(key, bits, inName, outName='myfile') -> file
+AES_Encrypt_ECB(key, bits, in_name, out_name='myfile') -> file
   
 AES_Encrypt_ECB performs 128, 192, or 256-bit AES encryption
 using the Electronic Code Book block cipher mode of operation
@@ -43,7 +43,7 @@ described in NIST Special Publication 800-38A.'''
  
 def AES_Decrypt_ECB(key, bits, inName, outName):
   '''
-AES_Decrypt_ECB(key, bits, inName, outName) -> file
+AES_Decrypt_ECB(key, bits, in_name, out_name) -> file
   
 AES_Decrypt_ECB performs 128, 192, or 256-bit AES decryption
 using the Electronic Code Book block cipher mode of operation
@@ -80,7 +80,7 @@ described in NIST Special Publication 800-38A.  '''
  
 def AES_Encrypt_128_ECB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_128_ECB(key, inName, outName='myfile') -> file
+AES_Encrypt_128_ECB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_128_ECB performs 128-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
@@ -92,7 +92,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_192_ECB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_192_ECB(key, inName, outName='myfile') -> file
+AES_Encrypt_192_ECB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_192_ECB performs 192-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
@@ -104,7 +104,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_256_ECB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_256_ECB(key, inName, outName='myfile') -> file
+AES_Encrypt_256_ECB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_256_ECB performs 256-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
@@ -117,7 +117,7 @@ described in NIST Special Publication 800-38A.'''
  
 def AES_Decrypt_128_ECB(key, inName, outName):
   '''
-AES_Decrypt_128_ECB(key, inName, outName) -> file
+AES_Decrypt_128_ECB(key, in_name, out_name) -> file
   
 AES_Decrypt_128_ECB performs 128-bit AES decryption using
 the Electronic Code Book block cipher mode of operation
@@ -129,7 +129,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_192_ECB(key, inName, outName):
   '''
-AES_Decrypt_192_ECB(key, inName, outName) -> file
+AES_Decrypt_192_ECB(key, in_name, out_name) -> file
   
 AES_Decrypt_192_ECB performs 192-bit AES decryption using
 the Electronic Code Book block cipher mode of operation
@@ -141,7 +141,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_256_ECB(key, inName, outName):
   '''
-AES_Decrypt_256_ECB(key, inName, outName) -> file
+AES_Decrypt_256_ECB(key, in_name, out_name) -> file
   
 AES_Decrypt_256_ECB performs 256-bit AES decryption using
 the Electronic Code Book block cipher mode of operation

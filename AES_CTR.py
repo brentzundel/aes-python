@@ -3,7 +3,7 @@ from AESHelp import xor, pad_strip, msb, lsb
 
 def AES_Cipher_CTR(key, bits, mode, inName, outName='myfile'):
   '''
-AES_Cipher_CTR(key, bits, mode, inName, outName='myfile') -> file
+AES_Cipher_CTR(key, bits, mode, in_name, out_name='myfile') -> file
   
 AES_Cipher_CTR performs 128, 192, or 256-bit AES encryption
 or decryption using the Counter block cipher mode
@@ -66,7 +66,7 @@ bytes object that has been incremented by i.'''
 
 def AES_Encrypt_128_CTR(key, inName, outName='myfile'):
   '''
-AES_Encrypt_128_CTR(key, inName, outName='myfile') -> file
+AES_Encrypt_128_CTR(key, in_name, out_name='myfile') -> file
 
 AES_Encrypt_128_CTR performs 128-bit AES encryption using
 the Counter block cipher mode of operation
@@ -78,7 +78,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_192_CTR(key, inName, outName='myfile'):
   '''
-AES_Encrypt_192_CTR(key, inName, outName='myfile') -> file
+AES_Encrypt_192_CTR(key, in_name, out_name='myfile') -> file
 
 AES_Encrypt_192_CTR performs 192-bit AES encryption using
 the Counter block cipher mode of operation
@@ -90,7 +90,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_256_CTR(key, inName, outName='myfile'):
   '''
-AES_Encrypt_256_CTR(key, inName, outName='myfile') -> file
+AES_Encrypt_256_CTR(key, in_name, out_name='myfile') -> file
 
 AES_Encrypt_256_CTR performs 256-bit AES encryption using
 the Counter block cipher mode of operation
@@ -103,7 +103,7 @@ described in NIST Special Publication 800-38A.'''
  
 def AES_Decrypt_128_CTR(key, inName, outName):
   '''
-AES_Decrypt_128_CTR(key, inName, outName) -> file
+AES_Decrypt_128_CTR(key, in_name, out_name) -> file
   
 AES_Decrypt_128_CTR performs 128-bit AES decryption using
 the Counter block cipher mode of operation
@@ -115,7 +115,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_192_CTR(key, inName, outName):
   '''
-AES_Decrypt_192_CTR(key, inName, outName) -> file
+AES_Decrypt_192_CTR(key, in_name, out_name) -> file
   
 AES_Decrypt_192_CTR performs 192-bit AES decryption using
 the Counter block cipher mode of operation
@@ -127,7 +127,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_256_CTR(key, inName, outName):
   '''
-AES_Decrypt_256_CTR(key, inName, outName) -> file
+AES_Decrypt_256_CTR(key, in_name, out_name) -> file
   
 AES_Decrypt_256_CTR performs 256-bit AES decryption using
 the Counter block cipher mode of operation

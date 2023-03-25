@@ -3,7 +3,7 @@ from AESHelp import xor, pad_strip, msb, lsb
 
 def AES_Cipher_OFB(key, bits, mode, inName, outName='myfile'):
   '''
-AES_Cipher_OFB(key, bits, mode, inName, outName='myfile') -> file
+AES_Cipher_OFB(key, bits, mode, in_name, out_name='myfile') -> file
   
 AES_Cipher_OFB performs 128, 192, or 256-bit AES encryption
 or decryption using the Output Feedback block cipher mode
@@ -48,7 +48,7 @@ of operation described in NIST Special Publication 800-38A.'''
  
 def AES_Encrypt_128_OFB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_128_OFB(key, inName, outName='myfile') -> file
+AES_Encrypt_128_OFB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_128_OFB performs 128-bit AES encryption using
 the Output Feedback block cipher mode of operation
@@ -60,7 +60,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_192_OFB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_192_OFB(key, inName, outName='myfile') -> file
+AES_Encrypt_192_OFB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_192_OFB performs 192-bit AES encryption using
 the Output Feedback block cipher mode of operation
@@ -72,7 +72,7 @@ described in NIST Special Publication 800-38A.'''
 
 def AES_Encrypt_256_OFB(key, inName, outName='myfile'):
   '''
-AES_Encrypt_256_OFB(key, inName, outName='myfile') -> file
+AES_Encrypt_256_OFB(key, in_name, out_name='myfile') -> file
   
 AES_Encrypt_256_OFB performs 256-bit AES encryption using
 the Output Feedback block cipher mode of operation
@@ -85,7 +85,7 @@ described in NIST Special Publication 800-38A.'''
  
 def AES_Decrypt_128_OFB(key, inName, outName):
   '''
-AES_Decrypt_128_OFB(key, inName, outName) -> file
+AES_Decrypt_128_OFB(key, in_name, out_name) -> file
   
 AES_Decrypt_128_OFB performs 128-bit AES decryption using
 the Output Feedback block cipher mode of operation
@@ -97,7 +97,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_192_OFB(key, inName, outName):
   '''
-AES_Decrypt_192_OFB(key, inName, outName) -> file
+AES_Decrypt_192_OFB(key, in_name, out_name) -> file
   
 AES_Decrypt_192_OFB performs 192-bit AES decryption using
 the Output Feedback block cipher mode of operation
@@ -109,7 +109,7 @@ described in NIST Special Publication 800-38A.  '''
 
 def AES_Decrypt_256_OFB(key, inName, outName):
   '''
-AES_Decrypt_256_OFB(key, inName, outName) -> file
+AES_Decrypt_256_OFB(key, in_name, out_name) -> file
   
 AES_Decrypt_256_OFB performs 256-bit AES decryption using
 the Output Feedback block cipher mode of operation
