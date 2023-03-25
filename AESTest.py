@@ -18,7 +18,7 @@ teststring = t1 + t2 + t3 + t4
 # that string can be used as an argument in the following function,
 #   to create the file:
 #
-def toFile(teststr):
+def to_file(teststr):
     fout = open('test', 'wb')
     fout.write(teststr)
     fout.close
@@ -38,11 +38,11 @@ key256 = \
 # A Function for comparing two files, byte by byte
 #
 ##
-def testFiles(file1, file2):
+def test_files(file1, file2):
     '''
-testFiles(file1, file2) -> bool
+test_files(file1, file2) -> bool
 
-testFiles compares the contents of two files and returns
+test_files compares the contents of two files and returns
 True if they are identical.'''
     in1 = open(file1, 'rb')
     in2 = open(file2, 'rb')
