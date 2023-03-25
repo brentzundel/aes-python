@@ -10,11 +10,11 @@ aes_encrypt_cbc performs 128, 192, or 256-bit AES encryption
 using the cipher Block chaining mode of operation
 described in NIST Special Publication 800-38A."""
     from os import urandom
-    fin, fout, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
+    f_in, f_out, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
     iv = urandom(16)
-    fout.write(iv)
+    f_out.write(iv)
     c = iv
-    os = fin.read(16)
+    os = f_in.read(16)
     while os != b'':
         m_len = len(os)
         if m_len < 16:
@@ -22,16 +22,16 @@ described in NIST Special Publication 800-38A."""
         else:
             pt = os
         c = Cipher(xor(pt, c), keys, n_k)
-        fout.write(c)
-        os = fin.read(16)
-    fin.close()
-    fout.close()
+        f_out.write(c)
+        os = f_in.read(16)
+    f_in.close()
+    f_out.close()
 
 
 def aes_cbc_helper(bits, in_name, key, out_name):
-    fin, fout, n_k = aes_file_helper(bits, in_name, out_name)
+    f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
     keys = key_expansion(key, n_k)
-    return fin, fout, keys, n_k
+    return f_in, f_out, keys, n_k
 
 
 def aes_decrypt_cbc(key, bits, in_name, out_name):
@@ -41,18 +41,18 @@ aes_decrypt_cbc(key, bits, in_name, out_name) -> file
 aes_decrypt_cbc performs 128, 192, or 256-bit AES decryption
 using the cipher Block chaining mode of operation
 described in NIST Special Publication 800-38A.  """
-    fin, fout, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
-    iv = fin.read(16)
-    os = fin.read(16)
+    f_in, f_out, keys, n_k = aes_cbc_helper(bits, in_name, key, out_name)
+    iv = f_in.read(16)
+    os = f_in.read(16)
     while os != b'':
         m = xor(InvCipher(os, keys, n_k), iv)
         iv = os
-        os = fin.read(16)
+        os = f_in.read(16)
         if os == b'':
             m = pad_strip(m)
-        fout.write(m)
-    fin.close()
-    fout.close()
+        f_out.write(m)
+    f_in.close()
+    f_out.close()
 
 
 def aes_encrypt_128_cbc(key, in_name, out_name='file'):

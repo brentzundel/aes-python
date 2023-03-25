@@ -1,3 +1,6 @@
+from AES import key_expansion
+
+
 def in_to_state(bytestring, n_b=4):
     """
 in_to_state(bytestring, n_b=4) -> state
@@ -18,7 +21,7 @@ out_from_state(state, n_b=4) -> out
 
 out_from_state copies state (2D array of longs) to out
 (byte string) according to the scheme described
-in section 3.4 ofthe Advanced Encryption Standard (FIPS 197)."""
+in section 3.4 of the Advanced Encryption Standard (FIPS 197)."""
     long = bytearray()
     for col in range(n_b):
         for row in range(4):
@@ -52,7 +55,7 @@ the end of the byte string os."""
 
 
 # prints a list of longs as a hexadecimal string
-def pilah(longs):
+def print_list_as_hex_string(longs):
     out = ''
     for x in map(hex, longs):
         if len(x[2:4]) == 1:
@@ -65,7 +68,7 @@ def pilah(longs):
 # prints a 2D array of longs as a 2d hexadecimal block
 def print_state(state, length=4):
     for i in range(length):
-        print(pilah(state[i]))
+        print(print_list_as_hex_string(state[i]))
 
 
 def prints(s):
@@ -106,7 +109,7 @@ def lsb(s, os):
     """
 lsb(s, os) -> os
 
-lsb returns the s least significant bits from os."""
+lsb returns the s least-significant bits from os."""
     b = s // 8
     if s == 0:
         return b''
@@ -116,11 +119,11 @@ lsb returns the s least significant bits from os."""
 
 def aes_file_helper(bits, in_name, out_name):
     try:
-        fin = open(in_name, 'rb')
+        f_in = open(in_name, 'rb')
     except OSError:
         raise
     try:
-        fout = open(out_name, 'wb')
+        f_out = open(out_name, 'wb')
     except OSError:
         raise
     if bits == 128:
@@ -131,4 +134,19 @@ def aes_file_helper(bits, in_name, out_name):
         n_k = 8
     else:
         raise Exception("%d-bit Encryption is not supported" % bits)
-    return fin, fout, n_k
+    return f_in, f_out, n_k
+
+
+def aes_ctr_ofb_helper(bits, in_name, key, mode, out_name):
+    from os import urandom
+    f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
+    keys = key_expansion(key, n_k)
+    if mode == 'e':
+        ctr = urandom(16)
+        f_out.write(ctr)
+    elif mode == 'd':
+        ctr = f_in.read(16)
+    else:
+        raise Exception('Unsupported Mode')
+    m = f_in.read(16)
+    return ctr, f_in, f_out, keys, m, n_k

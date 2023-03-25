@@ -1,137 +1,111 @@
-from AES import key_expansion, Cipher
-from AESHelp import xor, pad_strip, msb, lsb
+from AES import Cipher
+from AESHelp import xor, msb, aes_ctr_ofb_helper
 
-def AES_Cipher_CTR(key, bits, mode, inName, outName='myfile'):
-  '''
-AES_Cipher_CTR(key, bits, mode, in_name, out_name='myfile') -> file
-  
-AES_Cipher_CTR performs 128, 192, or 256-bit AES encryption
+
+def aes_cipher_ctr(key, bits, mode, in_name, out_name='file'):
+    """
+aes_cipher_ctr(key, bits, mode, in_name, out_name='file') -> file
+
+aes_cipher_ctr performs 128, 192, or 256-bit AES encryption
 or decryption using the Counter block cipher mode
-of operation described in NIST Special Publication 800-38A.'''
-  from os import urandom
-  try:
-    fin = open(inName, 'rb')
-  except:
-    raise Exception("Error opening file: %s" %(inName))
-  try:
-    fout = open(outName, 'wb')
-  except:
-    raise Exception("Error opening output file")
-  if bits == 128:
-    Nk = 4
-  elif bits == 192:
-    Nk = 6
-  elif bits == 256:
-    Nk = 8
-  else:
-    raise Exception("%d-bit Encryption is  not supported" %(bits))
-  keys = key_expansion(key, Nk)
-  if mode == 'e':
-    ctr = urandom(16)
-    fout.write(ctr)
-  elif mode == 'd':
-    ctr = fin.read(16)
-  else:
-    raise Exception('Unsupported Mode')
-  M = fin.read(16)
-  while len(M) == 16:
-    I = Cipher(ctr, keys, Nk)
-    fout.write(xor(M, I))
-    M = fin.read(16)
-    ctr = increment(ctr)
-  if M != b'':
-    I = Cipher(ctr, keys, Nk)
-    fout.write(xor(M, msb(len(M) * 8, I)))
-  fin.close()
-  fout.close()
+of operation described in NIST Special Publication 800-38A."""
+    ctr, f_in, f_out, keys, m, n_k = aes_ctr_ofb_helper(bits, in_name, key, mode, out_name)
+    while len(m) == 16:
+        inp = Cipher(ctr, keys, n_k)
+        f_out.write(xor(m, inp))
+        m = f_in.read(16)
+        ctr = increment(ctr)
+    if m != b'':
+        inp = Cipher(ctr, keys, n_k)
+        f_out.write(xor(m, msb(len(m) * 8, inp)))
+    f_in.close()
+    f_out.close()
 
 
- 
-def increment(OS, i=1):
-  '''
+def increment(os, i=1):
+    """
 increment(os, i=1) -> bytes
 
 increment takes a bytes object and returns a 
-bytes object that has been incremented by i.'''
-  if OS == b'':
-    return b''
-  else:
-    x = OS[-1]
-    x += i
-    if x > 255:
-      return increment(OS[0:-1]) + b'\x00'
+bytes object that has been incremented by i."""
+    if os == b'':
+        return b''
     else:
-      return OS[0:-1] + bytes([x])
+        x = os[-1]
+        x += i
+        if x > 255:
+            return increment(os[0:-1]) + b'\x00'
+        else:
+            return os[0:-1] + bytes([x])
+
+
+def aes_encrypt_128_ctr(key, in_name, out_name='file'):
+    """
+aes_encrypt_128_ctr(key, in_name, out_name='file') -> file
+
+aes_encrypt_128_ctr performs 128-bit AES encryption using
+the Counter block cipher mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_cipher_ctr(key, 128, 'e', in_name, out_name)
+
+
+def aes_encrypt_192_ctr(key, in_name, out_name='file'):
+    """
+aes_encrypt_192_ctr(key, in_name, out_name='file') -> file
+
+aes_encrypt_192_ctr performs 192-bit AES encryption using
+the Counter block cipher mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_cipher_ctr(key, 192, 'e', in_name, out_name)
+
+
+def aes_encrypt_256_ctr(key, in_name, out_name='file'):
+    """
+aes_encrypt_256_ctr(key, in_name, out_name='file') -> file
+
+aes_encrypt_256_ctr performs 256-bit AES encryption using
+the Counter block cipher mode of operation
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_cipher_ctr(key, 256, 'e', in_name, out_name)
+
+
+def aes_decrypt_128_ctr(key, in_name, out_name):
+    """
+aes_decrypt_128_ctr(key, in_name, out_name) -> file
   
-
-def AES_Encrypt_128_CTR(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_128_CTR(key, in_name, out_name='myfile') -> file
-
-AES_Encrypt_128_CTR performs 128-bit AES encryption using
+aes_decrypt_128_ctr performs 128-bit AES decryption using
 the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Cipher_CTR(key, 128, 'e', inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_cipher_ctr(key, 128, 'd', in_name, out_name)
 
 
-def AES_Encrypt_192_CTR(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_192_CTR(key, in_name, out_name='myfile') -> file
-
-AES_Encrypt_192_CTR performs 192-bit AES encryption using
-the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Cipher_CTR(key, 192, 'e', inName, outName)
-
-
-def AES_Encrypt_256_CTR(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_256_CTR(key, in_name, out_name='myfile') -> file
-
-AES_Encrypt_256_CTR performs 256-bit AES encryption using
-the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Cipher_CTR(key, 256, 'e', inName, outName)
-
+def aes_decrypt_192_ctr(key, in_name, out_name):
+    """
+aes_decrypt_192_ctr(key, in_name, out_name) -> file
   
- 
-def AES_Decrypt_128_CTR(key, inName, outName):
-  '''
-AES_Decrypt_128_CTR(key, in_name, out_name) -> file
-  
-AES_Decrypt_128_CTR performs 128-bit AES decryption using
+aes_decrypt_192_ctr performs 192-bit AES decryption using
 the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Cipher_CTR(key, 128, 'd', inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_cipher_ctr(key, 192, 'd', in_name, out_name)
 
 
-def AES_Decrypt_192_CTR(key, inName, outName):
-  '''
-AES_Decrypt_192_CTR(key, in_name, out_name) -> file
+def aes_decrypt_256_ctr(key, in_name, out_name):
+    """
+aes_decrypt_256_ctr(key, in_name, out_name) -> file
   
-AES_Decrypt_192_CTR performs 192-bit AES decryption using
+aes_decrypt_256_ctr performs 256-bit AES decryption using
 the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Cipher_CTR(key, 192, 'd', inName, outName)
-
-
-def AES_Decrypt_256_CTR(key, inName, outName):
-  '''
-AES_Decrypt_256_CTR(key, in_name, out_name) -> file
-  
-AES_Decrypt_256_CTR performs 256-bit AES decryption using
-the Counter block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Cipher_CTR(key, 256, 'd', inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_cipher_ctr(key, 256, 'd', in_name, out_name)

@@ -1,151 +1,118 @@
 from AES import Cipher, InvCipher, key_expansion
-from AESHelp import pad_strip, xor
+from AESHelp import pad_strip, aes_file_helper
 
 
-def AES_Encrypt_ECB(key, bits, inName, outName='myfile'):
-  '''
-AES_Encrypt_ECB(key, bits, in_name, out_name='myfile') -> file
+def aes_encrypt_ecb(key, bits, in_name, out_name='file'):
+    """
+aes_encrypt_ecb(key, bits, in_name, out_name='file') -> file
   
-AES_Encrypt_ECB performs 128, 192, or 256-bit AES encryption
+aes_encrypt_ecb performs 128, 192, or 256-bit AES encryption
 using the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  try:
-    fin = open(inName, 'rb')
-  except:
-    raise Exception("Error opening file: %s" %(inName))
-  try:
-    fout = open(outName, 'wb')
-  except:
-    raise Exception("Error opening output file")
-  if bits == 128:
-    Nk = 4
-  elif bits == 192:
-    Nk = 6
-  elif bits == 256:
-    Nk = 8
-  else:
-    raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = key_expansion(key, Nk)
-  OS = fin.read(16)
-  while OS != b'':
-    mLen = len(OS)
-    if mLen < 16:
-      M = OS + b'\x80' + bytes(16 - mLen - 1)
-    else:
-      M = OS
-    c = Cipher(M, keys, Nk)
-    fout.write(c)
-    OS = fin.read(16)
-  fin.close()
-  fout.close()
+described in NIST Special Publication 800-38A."""
+    f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
+    keys = key_expansion(key, n_k)
+    os = f_in.read(16)
+    while os != b'':
+        m_len = len(os)
+        if m_len < 16:
+            m = os + b'\x80' + bytes(16 - m_len - 1)
+        else:
+            m = os
+        c = Cipher(m, keys, n_k)
+        f_out.write(c)
+        os = f_in.read(16)
+    f_in.close()
+    f_out.close()
 
 
- 
-def AES_Decrypt_ECB(key, bits, inName, outName):
-  '''
-AES_Decrypt_ECB(key, bits, in_name, out_name) -> file
+def aes_decrypt_ecb(key, bits, in_name, out_name):
+    """
+aes_decrypt_ecb(key, bits, in_name, out_name) -> file
   
-AES_Decrypt_ECB performs 128, 192, or 256-bit AES decryption
+aes_decrypt_ecb performs 128, 192, or 256-bit AES decryption
 using the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  try:
-    fin = open(inName, 'rb')
-  except:
-    raise Exception("Error opening file: %s" %(inName))
-  try:
-    fout = open(outName, 'wb')
-  except:
-    raise Exception("Error opening output file")
-  if bits == 128:
-    Nk = 4
-  elif bits == 192:
-    Nk = 6
-  elif bits == 256:
-    Nk = 8
-  else:
-    raise Exception("%d-bit Encryption is not supported" %(bits))
-  keys = key_expansion(key, Nk)
-  OS = fin.read(16)
-  while OS != b'':
-    C = OS
-    OS = fin.read(16)
-    M = InvCipher(C, keys, Nk)
-    if OS == b'':
-      M = pad_strip(M)
-    fout.write(M)
-  fin.close()
-  fout.close()
-  
+described in NIST Special Publication 800-38A.  """
+    f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
+    keys = key_expansion(key, n_k)
+    os = f_in.read(16)
+    while os != b'':
+        c = os
+        os = f_in.read(16)
+        m = InvCipher(c, keys, n_k)
+        if os == b'':
+            m = pad_strip(m)
+        f_out.write(m)
+    f_in.close()
+    f_out.close()
 
- 
-def AES_Encrypt_128_ECB(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_128_ECB(key, in_name, out_name='myfile') -> file
+
+def aes_encrypt_128_ecb(key, in_name, out_name='file'):
+    """
+aes_encrypt_128_ecb(key, in_name, out_name='file') -> file
   
-AES_Encrypt_128_ECB performs 128-bit AES encryption using
+aes_encrypt_128_ecb performs 128-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Encrypt_ECB(key, 128, inName, outName)
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_encrypt_ecb(key, 128, in_name, out_name)
 
 
-def AES_Encrypt_192_ECB(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_192_ECB(key, in_name, out_name='myfile') -> file
+def aes_encrypt_192_ecb(key, in_name, out_name='file'):
+    """
+aes_encrypt_192_ecb(key, in_name, out_name='file') -> file
   
-AES_Encrypt_192_ECB performs 192-bit AES encryption using
+aes_encrypt_192_ecb performs 192-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Encrypt_ECB(key, 192, inName, outName)
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_encrypt_ecb(key, 192, in_name, out_name)
 
 
-def AES_Encrypt_256_ECB(key, inName, outName='myfile'):
-  '''
-AES_Encrypt_256_ECB(key, in_name, out_name='myfile') -> file
+def aes_encrypt_256_ecb(key, in_name, out_name='file'):
+    """
+aes_encrypt_256_ecb(key, in_name, out_name='file') -> file
   
-AES_Encrypt_256_ECB performs 256-bit AES encryption using
+aes_encrypt_256_ecb performs 256-bit AES encryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.'''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Encrypt_ECB(key, 256, inName, outName)
+described in NIST Special Publication 800-38A."""
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_encrypt_ecb(key, 256, in_name, out_name)
 
+
+def aes_decrypt_128_ecb(key, in_name, out_name):
+    """
+aes_decrypt_128_ecb(key, in_name, out_name) -> file
   
- 
-def AES_Decrypt_128_ECB(key, inName, outName):
-  '''
-AES_Decrypt_128_ECB(key, in_name, out_name) -> file
-  
-AES_Decrypt_128_ECB performs 128-bit AES decryption using
+aes_decrypt_128_ecb performs 128-bit AES decryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 16:
-    raise Exception('key must be 128 bits long')
-  AES_Decrypt_ECB(key, 128, inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 16:
+        raise Exception('key must be 128 bits long')
+    aes_decrypt_ecb(key, 128, in_name, out_name)
 
 
-def AES_Decrypt_192_ECB(key, inName, outName):
-  '''
-AES_Decrypt_192_ECB(key, in_name, out_name) -> file
+def aes_decrypt_192_ecb(key, in_name, out_name):
+    """
+aes_decrypt_192_ecb(key, in_name, out_name) -> file
   
-AES_Decrypt_192_ECB performs 192-bit AES decryption using
+aes_decrypt_192_ecb performs 192-bit AES decryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 24:
-    raise Exception('key must be 192 bits long')
-  AES_Decrypt_ECB(key, 192, inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 24:
+        raise Exception('key must be 192 bits long')
+    aes_decrypt_ecb(key, 192, in_name, out_name)
 
 
-def AES_Decrypt_256_ECB(key, inName, outName):
-  '''
-AES_Decrypt_256_ECB(key, in_name, out_name) -> file
+def aes_decrypt_256_ecb(key, in_name, out_name):
+    """
+aes_decrypt_256_ecb(key, in_name, out_name) -> file
   
-AES_Decrypt_256_ECB performs 256-bit AES decryption using
+aes_decrypt_256_ecb performs 256-bit AES decryption using
 the Electronic Code Book block cipher mode of operation
-described in NIST Special Publication 800-38A.  '''
-  if len(hex(key)[2:])/2 != 32:
-    raise Exception('key must be 256 bits long')
-  AES_Decrypt_ECB(key, 256, inName, outName)
+described in NIST Special Publication 800-38A.  """
+    if len(hex(key)[2:]) / 2 != 32:
+        raise Exception('key must be 256 bits long')
+    aes_decrypt_ecb(key, 256, in_name, out_name)

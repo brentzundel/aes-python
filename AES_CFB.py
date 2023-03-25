@@ -10,30 +10,30 @@ aes_encrypt_cfb performs 128, 192, or 256-bit AES encryption
 using the s-bit Cipher Feedback block cipher mode of operation
 described in NIST Special Publication 800-38A."""
     from os import urandom
-    b, fin, fout, keys, n_k = aes_cfb_helper(bits, in_name, key, out_name, s)
+    b, f_in, f_out, keys, n_k = aes_cfb_helper(bits, in_name, key, out_name, s)
     iv = urandom(16)
-    fout.write(iv)
-    piece = fin.read(b)
+    f_out.write(iv)
+    piece = f_in.read(b)
     while piece != b'':
         p_len = len(piece)
         if p_len < b:
             piece = piece + b'\x80' + bytes(b - p_len - 1)
         output = Cipher(iv, keys, n_k)
         encrypted_output = xor(piece, msb(s, output))
-        fout.write(encrypted_output)
-        piece = fin.read(b)
+        f_out.write(encrypted_output)
+        piece = f_in.read(b)
         iv = lsb(128 - s, iv) + encrypted_output
-    fin.close()
-    fout.close()
+    f_in.close()
+    f_out.close()
 
 
 def aes_cfb_helper(bits, in_name, key, out_name, s):
-    fin, fout, n_k = aes_file_helper(bits, in_name, out_name)
+    f_in, f_out, n_k = aes_file_helper(bits, in_name, out_name)
     if s % 8 != 0 or s < 8 or s > 128:
         raise Exception("s must be a multiple of 8, between 8 and 128")
     b = s // 8
     keys = key_expansion(key, n_k)
-    return b, fin, fout, keys, n_k
+    return b, f_in, f_out, keys, n_k
 
 
 def aes_decrypt_cfb(key, bits, s, in_name, out_name):
@@ -44,19 +44,19 @@ aes_decrypt_cfb performs 128, 192, or 256-bit AES decryption
 using the s-bit Cipher Feedback block cipher mode of operation
 described in NIST Special Publication 800-38A.  """
 
-    byte, fin, fout, keys, n_k = aes_cfb_helper(bits, in_name, key, out_name, s)
-    data_in = fin.read(16)
-    data_out = fin.read(byte)
+    byte, f_in, f_out, keys, n_k = aes_cfb_helper(bits, in_name, key, out_name, s)
+    data_in = f_in.read(16)
+    data_out = f_in.read(byte)
     while data_out != b'':
         o = Cipher(data_in, keys, n_k)
         p = xor(data_out, msb(s, o))
         data_in = lsb(128 - s, data_in) + data_out
-        data_out = fin.read(byte)
+        data_out = f_in.read(byte)
         if data_out == b'' and byte > 1:
             p = pad_strip(p)
-        fout.write(p)
-    fin.close()
-    fout.close()
+        f_out.write(p)
+    f_in.close()
+    f_out.close()
 
 
 def aes_encrypt_128_cfb_8(key, in_name, out_name='file'):
